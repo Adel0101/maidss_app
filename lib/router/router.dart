@@ -9,8 +9,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     //   return MaterialPageRoute(
     //       settings: settings, builder: (_) => const SplashView());
     case Routes.login:
-      return MaterialPageRoute(
-          settings: settings, builder: (_) => const LoginView());
+      return MaterialPageRoute(settings: settings, builder: (_) => LoginView());
     case Routes.dashboard:
       return MaterialPageRoute(
           settings: settings, builder: (_) => DashboardView());
