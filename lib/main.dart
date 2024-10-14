@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_maidss/features/login/auth_view_model.dart';
+import 'package:task_manager_maidss/features/tasks/task_view_model.dart';
 import 'package:task_manager_maidss/router/paths.dart';
 import 'package:task_manager_maidss/router/router.dart';
 import 'package:task_manager_maidss/services/network.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider<TaskViewModel>(create: (_) => TaskViewModel()),
       ],
       child: MaterialApp(
         title: 'Maidss Task Manager',

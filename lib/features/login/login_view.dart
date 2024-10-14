@@ -17,12 +17,11 @@ class _LoginViewState extends State<LoginView> {
   String _password = '';
 
   void _login() async {
-    if (!_formKey.currentState!.validate()) return;
+    _username = "emilys";
+    _password = "emilyspass";
+    // if (!_formKey.currentState!.validate()) return;
 
-    _formKey.currentState!.save();
-    print('err');
-    print(_username);
-    print(_password);
+    // _formKey.currentState!.save();
 
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     print(_username);
