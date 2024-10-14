@@ -17,9 +17,7 @@ class TaskApiService {
         'limit': limit,
         'skip': skip,
       });
-      print(response.data);
-      Tasks tasks = tasksFromJson(json.encode(response.data));
-      return tasks;
+      return tasksFromJson(json.encode(response.data));
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Failed to fetch tasks');
     }
