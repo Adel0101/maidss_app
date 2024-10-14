@@ -26,6 +26,7 @@ class TaskViewModel extends ChangeNotifier {
   DataState get dataState => _dataState;
   List<Todo> _dataList = [];
   List<Todo> get dataList => _dataList;
+  Tasks? tasks;
 
   fetchData({bool isRefresh = false}) async {
     if (!isRefresh) {
@@ -37,19 +38,18 @@ class TaskViewModel extends ChangeNotifier {
       _currentPageNumber = 0;
       _dataState = DataState.Refreshing;
     }
-    notifyListeners();
     try {
       if (_didLastLoad) {
         _dataState = DataState.No_More_Data;
       } else {
         try {
-          Tasks tasks = await _taskApiService.fetchTasks(
+          tasks = await _taskApiService.fetchTasks(
             limit: _limit,
             skip: _currentPageNumber * _limit,
           );
-          _dataList += tasks.todos;
+          _dataList += tasks!.todos;
           _dataState = DataState.Fetched;
-          _totalPages = (tasks.total / _limit).ceil();
+          _totalPages = (tasks!.total / _limit).ceil();
           _currentPageNumber++;
         } catch (e) {
           print('error :: $e');
@@ -62,16 +62,21 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
-  // Future<void> addTask(String title) async {
-  //   try {
-  //     Task task = await _taskApiService.addTask(title);
-  //     _tasks.add(task);
-  //     // await _dbService.insertTask(task);
-  //     notifyListeners();
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // }
+  void addTask(String title) {
+    // Create the Todo object locally
+    Todo newTask = Todo(
+      id: DateTime.now().millisecondsSinceEpoch,
+      todo: title,
+      completed: false,
+      userId: 0,
+    );
+
+    _dataList.insert(0, newTask);
+    print('Task added to _dataList. Total tasks: ${_dataList.length}');
+    notifyListeners();
+    print('Notified listeners after adding task');
+  }
+
   //
   // Future<void> updateTask(int id, String title) async {
   //   try {

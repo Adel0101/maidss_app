@@ -13,7 +13,7 @@ class TaskApiService {
 
   Future<Tasks> fetchTasks({int limit = 30, int skip = 0}) async {
     try {
-      final response = await _dio.get('/todos', queryParameters: {
+      final response = await _dio.get('/todos/user/1', queryParameters: {
         'limit': limit,
         'skip': skip,
       });
@@ -28,7 +28,7 @@ class TaskApiService {
       final response = await _dio.post('/todos/add', data: {
         'todo': title,
         'completed': false,
-        'userId': 5,
+        'userId': 1,
       });
       return Todo.fromJson(response.data);
     } on DioException catch (e) {

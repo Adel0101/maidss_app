@@ -1,103 +1,109 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_manager_maidss/features/tasks/components/alert_dialog.dart';
 import 'package:task_manager_maidss/features/tasks/task_model.dart';
 import 'package:task_manager_maidss/utils/constants.dart';
 
 import 'task_view_model.dart';
 
-class TaskListView extends StatelessWidget {
+class TaskListView extends StatefulWidget {
+  const TaskListView({super.key});
+
+  @override
+  _TaskListViewState createState() => _TaskListViewState();
+}
+
+class _TaskListViewState extends State<TaskListView> {
+  bool _isInit = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final taskViewModel = Provider.of<TaskViewModel>(context, listen: false);
+      taskViewModel.fetchData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ChangeNotifierProvider(
-      create: (context) => TaskViewModel(),
-      child: Consumer<TaskViewModel>(
-          builder: (BuildContext context, TaskViewModel controller, Widget? _) {
-        switch (controller.dataState) {
-          case DataState.Uninitialized:
-            Future(() {
-              controller.fetchData();
-            });
-            return _ListViewWidget(controller.dataList, false);
-          case DataState.Initial_Fetching:
-          case DataState.More_Fetching:
-          case DataState.Refreshing:
-            return _ListViewWidget(controller.dataList, true);
-          case DataState.Fetched:
-          case DataState.Error:
-          case DataState.No_More_Data:
-            return _ListViewWidget(controller.dataList, false);
-        }
-      }),
-    ));
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Show the add task dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AddTaskDialog();
+            },
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+      body: _ListViewWidget(),
+    );
   }
 }
 
 class _ListViewWidget extends StatelessWidget {
-  final List<Todo> _data;
-  bool _isLoading;
-  _ListViewWidget(this._data, this._isLoading);
-  late DataState _dataState;
-  late BuildContext _buildContext;
   @override
   Widget build(BuildContext context) {
-    _dataState = Provider.of<TaskViewModel>(context, listen: false).dataState;
-    _buildContext = context;
-    return SafeArea(child: _scrollNotificationWidget());
-  }
+    final taskViewModel = Provider.of<TaskViewModel>(context);
+    final data = taskViewModel.dataList;
+    final dataState = taskViewModel.dataState;
 
-  Widget _scrollNotificationWidget() {
-    return Column(
-      children: [
-        Expanded(
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
             child: NotificationListener<ScrollNotification>(
-                onNotification: _scrollNotification,
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await _onRefresh();
-                  },
-                  child: ListView.builder(
-                    itemCount: _data.length,
-                    itemBuilder: (context, index) {
-                      Todo task = _data[index];
-                      return ListTile(
-                        title: Text(task.todo),
-                        trailing: Checkbox(
-                          value: task.completed,
-                          onChanged: (value) {
-                            // Implement toggle completed status
-                          },
-                        ),
-                        onTap: () {
-                          // Navigate to edit task view
+              onNotification: (scrollInfo) =>
+                  _scrollNotification(context, scrollInfo),
+              child: RefreshIndicator(
+                onRefresh: () => _onRefresh(context),
+                child: ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    Todo task = data[index];
+                    return ListTile(
+                      title: Text(task.todo),
+                      trailing: Checkbox(
+                        value: task.completed,
+                        onChanged: (value) {
+                          // Implement toggle completed status
                         },
-                      );
-                    },
-                  ),
-                ))),
-        if (_dataState == DataState.More_Fetching)
-          Padding(
-            padding: EdgeInsets.only(bottom: Constants.padding),
-            child: Center(child: CircularProgressIndicator()),
+                      ),
+                      onTap: () {
+                        // Navigate to edit task view
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
           ),
-      ],
+          if (dataState == DataState.More_Fetching)
+            Padding(
+              padding: EdgeInsets.only(bottom: Constants.padding),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+        ],
+      ),
     );
   }
 
-  bool _scrollNotification(ScrollNotification scrollInfo) {
-    if (!_isLoading &&
+  bool _scrollNotification(
+      BuildContext context, ScrollNotification scrollInfo) {
+    final taskViewModel = Provider.of<TaskViewModel>(context, listen: false);
+    if (taskViewModel.dataState != DataState.More_Fetching &&
         scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-      _isLoading = true;
-      Provider.of<TaskViewModel>(_buildContext, listen: false).fetchData();
+      taskViewModel.fetchData();
     }
     return true;
   }
 
-  _onRefresh() async {
-    if (!_isLoading) {
-      _isLoading = true;
-      Provider.of<TaskViewModel>(_buildContext, listen: false)
-          .fetchData(isRefresh: true);
-    }
+  Future<void> _onRefresh(BuildContext context) async {
+    final taskViewModel = Provider.of<TaskViewModel>(context, listen: false);
+    await taskViewModel.fetchData(isRefresh: true);
   }
 }
