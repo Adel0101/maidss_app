@@ -11,7 +11,12 @@ class TaskApiService {
     _dio.options.baseUrl = Constants.baseUrl;
   }
 
-  ///fetch all the tasks
+  /// Fetches a list of tasks from the API.
+  ///
+  /// [limit]: The number of tasks to fetch.
+  /// [skip]: The number of tasks to skip (used for pagination).
+  ///
+  /// Returns a [Tasks] object containing a list of [Todo] items.
   Future<Tasks> fetchTasks(int userId, {int limit = 30, int skip = 0}) async {
     try {
       final response = await _dio.get('/todos', queryParameters: {
