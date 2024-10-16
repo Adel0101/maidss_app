@@ -11,7 +11,7 @@ class AuthApiService {
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       final response = await _dio.post(
-        '/auth/login',
+        Constants.loginUrl,
         data: {'username': username, 'password': password},
         options: Options(
           headers: {

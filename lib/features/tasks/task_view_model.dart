@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_maidss/features/tasks/task_model.dart';
+import 'package:task_manager_maidss/models/user.dart';
 import 'package:task_manager_maidss/services/api/task_service.dart';
 import 'package:task_manager_maidss/services/db_service.dart';
+import 'package:task_manager_maidss/utils/constants.dart';
 
 enum DataState {
   Uninitialized,
@@ -9,13 +12,18 @@ enum DataState {
   Initial_Fetching,
   More_Fetching,
   Fetched,
+  Fetched_Local,
   No_More_Data,
   Error
 }
 
 class TaskViewModel extends ChangeNotifier {
-  final TaskApiService _taskApiService = TaskApiService();
-  final DbService _dbService = DbService();
+  final TaskApiService _taskApiService;
+  final DbService _dbService;
+
+  TaskViewModel({TaskApiService? taskApiService, DbService? dbService})
+      : _taskApiService = taskApiService ?? TaskApiService(),
+        _dbService = dbService ?? DbService();
 
   final int _limit = 10;
 
@@ -30,6 +38,9 @@ class TaskViewModel extends ChangeNotifier {
   Tasks? tasks;
 
   Future<void> fetchData({bool isRefresh = false}) async {
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
+    final User user =
+        userFromJson(_prefs.getString(Constants.sharedPrefsKey_user)!);
     if (!isRefresh) {
       _dataState = (_dataState == DataState.Uninitialized)
           ? DataState.Initial_Fetching
@@ -39,12 +50,13 @@ class TaskViewModel extends ChangeNotifier {
       _currentPageNumber = 0;
       _dataState = DataState.Refreshing;
     }
-
+    notifyListeners();
     if (_didLastLoad) {
       _dataState = DataState.No_More_Data;
     } else {
       try {
         tasks = await _taskApiService.fetchTasks(
+          user.id,
           limit: _limit,
           skip: _currentPageNumber * _limit,
         );
@@ -58,21 +70,31 @@ class TaskViewModel extends ChangeNotifier {
         if (kDebugMode) {
           print('No network fetched data locally');
         }
-        _dataList = await _dbService.getAllTodos();
-        _dataState = DataState.Error;
+        _dataList = (await _dbService.getAllTodos()).reversed.toList();
+        _dataState = DataState.Fetched_Local;
         notifyListeners();
       }
     }
   }
 
   Future<void> addTask(String title) async {
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
+    final User user =
+        userFromJson(_prefs.getString(Constants.sharedPrefsKey_user)!);
     try {
-      Todo task = await _taskApiService.addTask(title);
+      Todo task = await _taskApiService.addTask(title, user.id);
       _dataList.insert(0, task);
       await _dbService.insertTodo(task);
       notifyListeners();
     } catch (e) {
-      // Todo todo = Todo(id: DateTime.now().toIso8601String(), todo: todo, completed: completed, userId: userId)
+      Todo todo = Todo(
+          id: DateTime.now().microsecondsSinceEpoch,
+          todo: title,
+          completed: false,
+          userId: user.id);
+      _dataList.insert(0, todo);
+      await _dbService.insertTodo(todo);
+      notifyListeners();
     }
   }
 
@@ -98,7 +120,7 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<void> updateTaskText(int id, String title) async {
     try {
-      /*Todo updatedTask = await _taskApiService.updateTask(id, status);*/ // simulate the update of a todo
+      /*Todo updatedTask = await _taskApiService.updateTask(id, status);*/ // simulate the update of a todo, since the return object wont contain the changes
       int index = _dataList.indexWhere((task) => task.id == id);
       if (index != -1) {
         _dataList[index] = _dataList[index].copyWith(todo: title);
@@ -118,7 +140,7 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<void> deleteTask(int id) async {
     try {
-      // await _taskApiService.deleteTask(id); simulate the update of a todo
+      // await _taskApiService.deleteTask(id); //simulate the update of a todo, since the return object wont contain the changes
       _dataList.removeWhere((task) => task.id == id);
       await _dbService.deleteTodo(id);
       notifyListeners();

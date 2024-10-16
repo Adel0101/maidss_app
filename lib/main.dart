@@ -26,11 +26,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Maidss Task Manager',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        initialRoute: Routes.login,
+        theme: ThemeData(useMaterial3: true),
+        initialRoute: Routes.initial,
         onGenerateRoute: generateRoute,
       ),
     );

@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final tasks = tasksFromJson(jsonString);
-
 import 'dart:convert';
 
 Tasks tasksFromJson(String str) => Tasks.fromJson(json.decode(str));
@@ -82,7 +78,7 @@ class Todo {
     return Todo(
       id: json['id'],
       todo: json['todo'],
-      completed: json['completed'], // From API: boolean
+      completed: json['completed'],
       userId: json['userId'],
       synced: true, // Assuming data from API is synced
     );

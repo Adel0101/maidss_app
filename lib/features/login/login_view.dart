@@ -22,12 +22,8 @@ class _LoginViewState extends State<LoginView> {
   String _password = '';
 
   void _login() async {
-    _username = "emilys";
-    _password = "emilyspass";
-    // if (!_formKey.currentState!.validate()) return;
-
-    // _formKey.currentState!.save();
-
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     try {
       bool success = await authViewModel.login(_username, _password);
@@ -60,7 +56,6 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  // Build method with form fields and login button
   @override
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
@@ -133,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
                       onPress: () {},
                       backgroundColor: Colors.white,
                       title: Text(
-                        'Sign in with Google',
+                        Constants.googleButtonText,
                         style: Constants.primaryButtonTextStyle
                             .copyWith(color: Colors.black),
                       ),
@@ -144,7 +139,7 @@ class _LoginViewState extends State<LoginView> {
                       onPress: () {},
                       backgroundColor: Constants.facebookColor,
                       title: const Text(
-                        'Sign in with Facebook',
+                        Constants.fbButtonText,
                         style: Constants.primaryButtonTextStyle,
                       ),
                     ),

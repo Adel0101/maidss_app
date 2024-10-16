@@ -57,7 +57,7 @@ class _TaskAlertDialogState extends State<TaskAlertDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -75,7 +75,7 @@ class _TaskAlertDialogState extends State<TaskAlertDialog> {
               }
             }
           },
-          child: Text('Done'),
+          child: const Text('Done'),
         ),
       ],
     );

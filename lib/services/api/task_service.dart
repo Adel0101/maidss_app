@@ -11,9 +11,10 @@ class TaskApiService {
     _dio.options.baseUrl = Constants.baseUrl;
   }
 
-  Future<Tasks> fetchTasks({int limit = 30, int skip = 0}) async {
+  ///fetch all the tasks
+  Future<Tasks> fetchTasks(int userId, {int limit = 30, int skip = 0}) async {
     try {
-      final response = await _dio.get('/todos/user/1', queryParameters: {
+      final response = await _dio.get('/todos', queryParameters: {
         'limit': limit,
         'skip': skip,
       });
@@ -23,12 +24,13 @@ class TaskApiService {
     }
   }
 
-  Future<Todo> addTask(String title) async {
+  ///add a task, require the text and user id
+  Future<Todo> addTask(String title, int userId) async {
     try {
       final response = await _dio.post('/todos/add', data: {
         'todo': title,
         'completed': false,
-        'userId': 1,
+        'userId': userId,
       });
       return Todo.fromJson(response.data);
     } on DioException catch (e) {
@@ -36,6 +38,7 @@ class TaskApiService {
     }
   }
 
+  ///update a task, require task id and the value
   Future<Todo> updateTask(int id, bool status) async {
     try {
       final response = await _dio.put('/todos/$id', data: {
@@ -47,6 +50,7 @@ class TaskApiService {
     }
   }
 
+  ///delete a task, require task id
   Future<void> deleteTask(int id) async {
     try {
       await _dio.delete('/todos/$id');
