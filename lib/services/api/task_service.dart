@@ -36,10 +36,10 @@ class TaskApiService {
     }
   }
 
-  Future<Todo> updateTask(int id, String title) async {
+  Future<Todo> updateTask(int id, bool status) async {
     try {
       final response = await _dio.put('/todos/$id', data: {
-        'todo': title,
+        'completed': status,
       });
       return Todo.fromJson(response.data);
     } on DioException catch (e) {

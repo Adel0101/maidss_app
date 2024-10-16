@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager_maidss/features/tasks/task_model.dart';
 import 'package:task_manager_maidss/services/api/task_service.dart';
+import 'package:task_manager_maidss/services/db_service.dart';
 
 enum DataState {
   Uninitialized,
@@ -14,7 +15,7 @@ enum DataState {
 
 class TaskViewModel extends ChangeNotifier {
   final TaskApiService _taskApiService = TaskApiService();
-  // final DbService _dbService = DbService();
+  final DbService _dbService = DbService();
 
   final int _limit = 10;
 
@@ -49,6 +50,7 @@ class TaskViewModel extends ChangeNotifier {
           );
           _dataList += tasks!.todos;
           _dataState = DataState.Fetched;
+          await _dbService.insertTodosBulk(_dataList);
           _totalPages = (tasks!.total / _limit).ceil();
           _currentPageNumber++;
         } catch (e) {
@@ -57,49 +59,72 @@ class TaskViewModel extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
+      _dataList = await _dbService.getAllTodos();
       _dataState = DataState.Error;
       notifyListeners();
+      rethrow;
     }
   }
 
-  void addTask(String title) {
-    // Create the Todo object locally
-    Todo newTask = Todo(
-      id: DateTime.now().millisecondsSinceEpoch,
-      todo: title,
-      completed: false,
-      userId: 0,
-    );
-
-    _dataList.insert(0, newTask);
-    print('Task added to _dataList. Total tasks: ${_dataList.length}');
-    notifyListeners();
-    print('Notified listeners after adding task');
+  Future<void> addTask(String title) async {
+    try {
+      Todo task = await _taskApiService.addTask(title);
+      _dataList.insert(0, task);
+      await _dbService.insertTodo(task);
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
-  //
-  // Future<void> updateTask(int id, String title) async {
-  //   try {
-  //     Task updatedTask = await _taskApiService.updateTask(id, title);
-  //     int index = _tasks.indexWhere((task) => task.id == id);
-  //     if (index != -1) {
-  //       _tasks[index] = updatedTask;
-  //       // await _dbService.updateTask(updatedTask);
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // }
-  //
-  // Future<void> deleteTask(int id) async {
-  //   try {
-  //     await _taskApiService.deleteTask(id);
-  //     _tasks.removeWhere((task) => task.id == id);
-  //     // await _dbService.deleteTask(id);
-  //     notifyListeners();
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // }
+  Future<void> updateTask(int id, bool status) async {
+    try {
+      Todo updatedTask = await _taskApiService.updateTask(id, status);
+      int index = _dataList.indexWhere((task) => task.id == id);
+      if (index != -1) {
+        _dataList[index] = updatedTask;
+        await _dbService.updateTodo(updatedTask);
+        notifyListeners();
+      }
+    } catch (e) {
+      // in case a new task is added, then changes will only happen locally
+      int index = _dataList.indexWhere((task) => task.id == id);
+      if (index != -1) {
+        _dataList[index] = _dataList[index].copyWith(completed: status);
+        await _dbService.updateTodo(_dataList[index]);
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> updateTaskText(int id, String title) async {
+    try {
+      /*Todo updatedTask = await _taskApiService.updateTask(id, status);*/ // simulate the update of a todo
+      int index = _dataList.indexWhere((task) => task.id == id);
+      if (index != -1) {
+        _dataList[index] = _dataList[index].copyWith(todo: title);
+        await _dbService.updateTodo(_dataList[index]);
+        notifyListeners();
+      }
+    } catch (e) {
+      // in case a new task is added, then changes will only happen locally
+      int index = _dataList.indexWhere((task) => task.id == id);
+      if (index != -1) {
+        _dataList[index] = _dataList[index].copyWith(todo: title);
+        await _dbService.updateTodo(_dataList[index]);
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> deleteTask(int id) async {
+    try {
+      // await _taskApiService.deleteTask(id); simulate the update of a todo
+      _dataList.removeWhere((task) => task.id == id);
+      await _dbService.deleteTodo(id);
+      notifyListeners();
+    } catch (e) {
+      throw e;
+    }
+  }
 }
