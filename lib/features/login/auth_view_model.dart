@@ -23,4 +23,18 @@ class AuthViewModel extends ChangeNotifier {
       throw e;
     }
   }
+
+  String? validateUsername(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter username';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter password';
+    }
+    return null;
+  }
 }

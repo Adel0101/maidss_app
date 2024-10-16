@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:task_manager_maidss/features/tasks/task_model.dart';
 import 'package:task_manager_maidss/services/api/task_service.dart';
 import 'package:task_manager_maidss/services/db_service.dart';
@@ -29,7 +29,7 @@ class TaskViewModel extends ChangeNotifier {
   List<Todo> get dataList => _dataList;
   Tasks? tasks;
 
-  fetchData({bool isRefresh = false}) async {
+  Future<void> fetchData({bool isRefresh = false}) async {
     if (!isRefresh) {
       _dataState = (_dataState == DataState.Uninitialized)
           ? DataState.Initial_Fetching
@@ -39,30 +39,29 @@ class TaskViewModel extends ChangeNotifier {
       _currentPageNumber = 0;
       _dataState = DataState.Refreshing;
     }
-    try {
-      if (_didLastLoad) {
-        _dataState = DataState.No_More_Data;
-      } else {
-        try {
-          tasks = await _taskApiService.fetchTasks(
-            limit: _limit,
-            skip: _currentPageNumber * _limit,
-          );
-          _dataList += tasks!.todos;
-          _dataState = DataState.Fetched;
-          await _dbService.insertTodosBulk(_dataList);
-          _totalPages = (tasks!.total / _limit).ceil();
-          _currentPageNumber++;
-        } catch (e) {
-          print('error :: $e');
+
+    if (_didLastLoad) {
+      _dataState = DataState.No_More_Data;
+    } else {
+      try {
+        tasks = await _taskApiService.fetchTasks(
+          limit: _limit,
+          skip: _currentPageNumber * _limit,
+        );
+        _dataList += tasks!.todos;
+        _dataState = DataState.Fetched;
+        await _dbService.insertTodosBulk(_dataList);
+        _totalPages = (tasks!.total / _limit).ceil();
+        _currentPageNumber++;
+        notifyListeners();
+      } catch (e) {
+        if (kDebugMode) {
+          print('No network fetched data locally');
         }
+        _dataList = await _dbService.getAllTodos();
+        _dataState = DataState.Error;
+        notifyListeners();
       }
-      notifyListeners();
-    } catch (e) {
-      _dataList = await _dbService.getAllTodos();
-      _dataState = DataState.Error;
-      notifyListeners();
-      rethrow;
     }
   }
 
@@ -73,7 +72,7 @@ class TaskViewModel extends ChangeNotifier {
       await _dbService.insertTodo(task);
       notifyListeners();
     } catch (e) {
-      print(e);
+      // Todo todo = Todo(id: DateTime.now().toIso8601String(), todo: todo, completed: completed, userId: userId)
     }
   }
 

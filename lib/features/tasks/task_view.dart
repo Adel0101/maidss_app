@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_maidss/features/tasks/components/alert_dialog.dart';
+import 'package:task_manager_maidss/utils/constants.dart';
 
 import 'components/list_view_widget.dart';
 import 'task_view_model.dart';
@@ -13,8 +14,6 @@ class TaskListView extends StatefulWidget {
 }
 
 class _TaskListViewState extends State<TaskListView> {
-  bool _isInit = true;
-
   @override
   void initState() {
     super.initState();
@@ -27,10 +26,20 @@ class _TaskListViewState extends State<TaskListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          'All Todos',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        automaticallyImplyLeading: false,
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show the add task dialog
-          showDialog(
+        backgroundColor: Constants.primaryColor,
+        onPressed: () async {
+          await showDialog(
             context: context,
             builder: (BuildContext context) {
               return const TaskAlertDialog(
@@ -40,7 +49,10 @@ class _TaskListViewState extends State<TaskListView> {
             },
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       body: const ListViewWidget(),
     );

@@ -31,7 +31,8 @@ class DbService {
         id INTEGER PRIMARY KEY,
         todo TEXT,
         completed INTEGER,
-        userId INTEGER
+        userId INTEGER,
+        synced INTEGER
       )
     ''');
     print('created DB successfully');
@@ -39,14 +40,14 @@ class DbService {
 
   Future<void> insertTodo(Todo todo) async {
     final db = await database;
-    await db.insert(Constants.tableTodos, todo.toJson(),
+    await db.insert(Constants.tableTodos, todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Todo>> getAllTodos() async {
     final db = await database;
     final todos = await db.query(Constants.tableTodos);
-    return todos.map((todo) => Todo.fromJson(todo)).toList();
+    return todos.map((todo) => Todo.fromMap(todo)).toList();
   }
 
   Future<void> insertTodosBulk(List<Todo> todos) async {
@@ -56,7 +57,7 @@ class DbService {
     for (Todo todo in todos) {
       batch.insert(
         Constants.tableTodos,
-        todo.toJson(),
+        todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
@@ -65,7 +66,7 @@ class DbService {
 
   Future<void> updateTodo(Todo todo) async {
     final db = await database;
-    await db.update(Constants.tableTodos, todo.toJson(),
+    await db.update(Constants.tableTodos, todo.toMap(),
         where: 'id = ?', whereArgs: [todo.id]);
   }
 

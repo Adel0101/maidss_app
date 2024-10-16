@@ -31,6 +31,12 @@ class PrimaryButton extends StatelessWidget {
                   8), //TODO:: make it responsive
           decoration: BoxDecoration(
             color: backgroundColor,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: (0.1 * (MediaQuery.sizeOf(context).height / 8)),
+                  spreadRadius: 2)
+            ],
             borderRadius: BorderRadius.circular(0.1 *
                 (MediaQuery.sizeOf(context).height /
                     8)), //TODO:: make it responsive

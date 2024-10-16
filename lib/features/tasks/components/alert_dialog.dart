@@ -34,7 +34,7 @@ class _TaskAlertDialogState extends State<TaskAlertDialog> {
       title: Text(widget.title ?? 'N/A'),
       content: Form(
         key: _formKey,
-        child: widget.value != null || widget.value!.isEmpty
+        child: widget.value != null || (widget.value?.isEmpty ?? false)
             ? TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Task Title',
