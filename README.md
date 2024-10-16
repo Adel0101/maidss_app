@@ -222,9 +222,9 @@ and by applying the following:
 
 Let's Keep in Touch
 
-Email: adel.assi1@hotmail.com
-GitHub: Adel0101
-LinkedIn: https://www.linkedin.com/in/adel-assi
+- Email: adel.assi1@hotmail.com
+- GitHub: Adel0101
+- LinkedIn: https://www.linkedin.com/in/adel-assi
 
 - **Feel free to reach out for collaborations, suggestions, or just to say hello!**
 
