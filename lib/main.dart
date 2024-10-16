@@ -5,6 +5,7 @@ import 'package:task_manager_maidss/features/tasks/task_view_model.dart';
 import 'package:task_manager_maidss/router/paths.dart';
 import 'package:task_manager_maidss/router/router.dart';
 import 'package:task_manager_maidss/services/network.dart';
+import 'package:task_manager_maidss/utils/responsive/size_config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,13 +24,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
         ChangeNotifierProvider<TaskViewModel>(create: (_) => TaskViewModel()),
       ],
-      child: MaterialApp(
-        title: 'Maidss Task Manager',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true),
-        initialRoute: Routes.initial,
-        onGenerateRoute: generateRoute,
-      ),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return OrientationBuilder(builder: (context, orientation) {
+          SizeConfig().init(constraints, orientation);
+          return MaterialApp(
+            title: 'Maidss Task Manager',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(useMaterial3: true),
+            initialRoute: Routes.initial,
+            onGenerateRoute: generateRoute,
+          );
+        });
+      }),
     );
   }
 }

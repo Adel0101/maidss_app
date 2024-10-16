@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_maidss/utils/responsive/size_config.dart';
 
 class Constants {
   static double padding = 16;
@@ -16,10 +17,18 @@ class Constants {
   static const Color primaryColor = Color(0xff01FFFF);
   static const Color facebookColor = Color(0xff0866FF);
 
-  static const TextStyle primaryButtonTextStyle =
-      TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w800);
-  static const TextStyle todoCardTextStyle =
-      TextStyle(fontWeight: FontWeight.w700, fontSize: 18);
-  static const TextStyle todoCardSubTextStyle =
-      TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.grey);
+  static TextStyle primaryButtonTextStyle = TextStyle(
+      fontSize: 2 * SizeConfig.textMultiplier!,
+      color: Colors.white,
+      fontWeight: FontWeight.w800);
+
+  static TextStyle todoCardTextStyle = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 2 * SizeConfig.textMultiplier!,
+  );
+
+  static TextStyle todoCardSubTextStyle = TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 1.8 * SizeConfig.textMultiplier!,
+      color: Colors.grey);
 }

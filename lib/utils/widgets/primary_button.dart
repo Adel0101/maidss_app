@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager_maidss/utils/constants.dart';
+import 'package:task_manager_maidss/utils/responsive/size_config.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -26,20 +27,16 @@ class PrimaryButton extends StatelessWidget {
           margin: margin ?? EdgeInsets.all(Constants.padding / 2),
           alignment: Alignment.center,
           width: MediaQuery.sizeOf(context).width,
-          height: 0.6 *
-              (MediaQuery.sizeOf(context).height /
-                  8), //TODO:: make it responsive
+          height: 65 * SizeConfig.hMultiplier!,
           decoration: BoxDecoration(
             color: backgroundColor,
             boxShadow: [
               BoxShadow(
                   color: Colors.grey.withOpacity(0.3),
-                  blurRadius: (0.1 * (MediaQuery.sizeOf(context).height / 8)),
+                  blurRadius: 10 * SizeConfig.hMultiplier!,
                   spreadRadius: 2)
             ],
-            borderRadius: BorderRadius.circular(0.1 *
-                (MediaQuery.sizeOf(context).height /
-                    8)), //TODO:: make it responsive
+            borderRadius: BorderRadius.circular(10 * SizeConfig.hMultiplier!),
           ),
           child: title,
         ),

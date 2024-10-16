@@ -117,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
                     PrimaryButton(
                       margin: EdgeInsets.zero,
                       onPress: _login,
-                      title: const Text(
+                      title: Text(
                         'Login',
                         style: Constants.primaryButtonTextStyle,
                       ),
@@ -138,7 +138,7 @@ class _LoginViewState extends State<LoginView> {
                       margin: EdgeInsets.zero,
                       onPress: () {},
                       backgroundColor: Constants.facebookColor,
-                      title: const Text(
+                      title: Text(
                         Constants.fbButtonText,
                         style: Constants.primaryButtonTextStyle,
                       ),

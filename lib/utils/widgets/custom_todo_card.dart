@@ -3,6 +3,7 @@ import 'package:task_manager_maidss/features/tasks/components/alert_dialog.dart'
 import 'package:task_manager_maidss/features/tasks/task_model.dart';
 import 'package:task_manager_maidss/features/tasks/task_view_model.dart';
 import 'package:task_manager_maidss/utils/constants.dart';
+import 'package:task_manager_maidss/utils/responsive/size_config.dart';
 
 class CustomTodoCard extends StatelessWidget {
   const CustomTodoCard({
@@ -58,7 +59,7 @@ class CustomTodoCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Due Date',
                         style: Constants.todoCardSubTextStyle,
                       ),
@@ -77,10 +78,10 @@ class CustomTodoCard extends StatelessWidget {
                             },
                           );
                         },
-                        child: const Icon(
+                        child: Icon(
                           Icons.mode_edit_outline_outlined,
                           color: Colors.grey,
-                          size: 22,
+                          size: 5.5 * SizeConfig.imageSizeMultiplier!,
                         ),
                       ),
                     ],
